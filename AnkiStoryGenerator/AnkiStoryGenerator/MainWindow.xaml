@@ -25,6 +25,7 @@
             <Button
                 Name="GenerateStory"
                 Padding="15"
+                Click="GenerateStory_OnClick"
                 DockPanel.Dock="Bottom"
                 FontWeight="Bold"
                 IsDefault="True">
@@ -77,12 +78,24 @@
                     </TextBlock>
                     <DataGrid
                         d:DataContext="{d:DesignInstance Type=viewModels:MainWindowViewModel}"
-                        AutoGenerateColumns="True"
+                        AutoGenerateColumns="False"
                         Background="White"
                         CanUserSortColumns="True"
                         HorizontalGridLinesBrush="LightGray"
                         IsReadOnly="True"
-                        ItemsSource="{Binding Flashcards}" />
+                        ItemsSource="{Binding Flashcards}"
+                        VerticalGridLinesBrush="LightGray">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn
+                                Width="*"
+                                Binding="{Binding Question, Mode=OneTime}"
+                                Header="Question" />
+                            <DataGridTextColumn
+                                Width="*"
+                                Binding="{Binding Answer, Mode=OneTime}"
+                                Header="Answer" />
+                        </DataGrid.Columns>
+                    </DataGrid>
                 </DockPanel>
             </Grid>
         </DockPanel>

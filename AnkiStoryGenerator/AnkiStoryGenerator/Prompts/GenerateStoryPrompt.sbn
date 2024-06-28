@@ -1,0 +1,5 @@
+﻿Hello {{Name}} x,
+
+Here is the list of your items:
+{{ for item in Items }}- {{item}}
+{{ end }}

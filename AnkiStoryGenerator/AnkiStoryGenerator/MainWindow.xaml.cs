@@ -2,7 +2,9 @@
 using AnkiStoryGenerator.ViewModels;
 using Microsoft.Web.WebView2.Core;
 using PropertyChanged;
+using System.IO;
 using System.Windows;
+using ScribanTemplate = Scriban.Template;
 
 namespace AnkiStoryGenerator
 {
@@ -48,9 +50,24 @@ namespace AnkiStoryGenerator
                 this.viewModel.Flashcards.Add(new FlashcardViewModel(flashcard.Question, flashcard.Answer));
             }
 
-            viewModel.ChatGptPrompt = "yo dawg";
             await SetPreviewWindowHtml();
 
         }
+
+        private void GenerateStory_OnClick(object sender, RoutedEventArgs e)
+        {
+            // hardcoded for faster feedback loop
+            var templatePath = "D:\\Projekty\\AnkiStoryGenerator\\AnkiStoryGenerator\\AnkiStoryGenerator\\Prompts\\GenerateStoryPrompt.sbn";
+
+            var templateContent = File.ReadAllText(templatePath);
+
+            var model = new GenerateStoryParametersModel("John Doe", new List<string> { "Item1", "Item2", "Item3" });
+            var template = ScribanTemplate.Parse(templateContent, templatePath);
+            string result = template.Render(model, x => x.Name);
+
+            viewModel.ChatGptPrompt = result;
+        }
     }
+
+    internal record GenerateStoryParametersModel(string Name, List<string> Items);
 }
