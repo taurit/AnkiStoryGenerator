@@ -4,9 +4,9 @@ namespace AnkiStoryGenerator.Tests
     public class TestExample
     {
         [TestMethod]
-        public void FailingTest()
+        public void PassingTest()
         {
-            Assert.Fail("Test: this test should intentionally fail and I should receive a notification email");
+            // CI/CD test
         }
     }
 }
