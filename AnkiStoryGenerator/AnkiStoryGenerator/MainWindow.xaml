@@ -106,14 +106,21 @@
         <Grid Grid.Column="2">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="2*" />
             </Grid.RowDefinitions>
 
             <TextBox
+                Grid.Row="0"
                 IsReadOnly="True"
                 Text="{Binding ChatGptPrompt, Mode=OneWay}"
                 TextWrapping="Wrap" />
-            <wpf:WebView2 Name="WebViewControl" Grid.Row="1" />
+
+            <GridSplitter
+                Grid.Row="1"
+                Height="10"
+                ResizeBehavior="PreviousAndNext" />
+            <wpf:WebView2 Name="WebViewControl" Grid.Row="2" />
         </Grid>
     </Grid>
 </Window>

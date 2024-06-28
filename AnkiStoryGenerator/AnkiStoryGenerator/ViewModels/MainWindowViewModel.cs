@@ -8,7 +8,7 @@ public class MainWindowViewModel
 {
     public string Language { get; } = "Spanish"; // hardcoded, but in the future, this could be a dropdown
     public string DeckName { get; } = "1. Spanish"; // hardcoded, but in the future, this could be a dropdown
-    public string Genre { get; } = "Crime"; // hardcoded, but in the future, this could be a dropdown
+    public string Genre { get; } = "crime"; // hardcoded, but in the future, this could be a dropdown
 
     public int NumRecentFlashcardsToUse { get; } = 10;
     public int PreferredLengthOfAStoryInWords { get; } = 400;
@@ -18,8 +18,9 @@ public class MainWindowViewModel
 }
 
 [AddINotifyPropertyChangedInterface]
-public sealed class FlashcardViewModel(string question, string answer)
+public sealed class FlashcardViewModel(int id, string question, string answer)
 {
+    public int Id { get; } = id;
     public string Question { get; } = question;
     public string Answer { get; } = answer;
 
