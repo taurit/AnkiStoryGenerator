@@ -55,7 +55,13 @@
                         <Run Foreground="DarkOrchid" Text="{Binding PreferredLengthOfAStoryInWords, Mode=OneWay}" />
                     </TextBlock>
 
-                    <Button Margin="0,10,0,0" Padding="5" Name="LoadFlashcards" Click="LoadFlashcards_OnClick">Load flashcards</Button>
+                    <Button
+                        Name="LoadFlashcards"
+                        Margin="0,10,0,0"
+                        Padding="5"
+                        Click="LoadFlashcards_OnClick">
+                        Load flashcards
+                    </Button>
                 </StackPanel>
                 <DockPanel
                     Grid.Row="1"
@@ -69,7 +75,14 @@
                         Foreground="CornflowerBlue">
                         Words to use:
                     </TextBlock>
-                    <DataGrid />
+                    <DataGrid
+                        d:DataContext="{d:DesignInstance Type=viewModels:MainWindowViewModel}"
+                        AutoGenerateColumns="True"
+                        Background="White"
+                        CanUserSortColumns="True"
+                        HorizontalGridLinesBrush="LightGray"
+                        IsReadOnly="True"
+                        ItemsSource="{Binding Flashcards}" />
                 </DockPanel>
             </Grid>
         </DockPanel>

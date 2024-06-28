@@ -1,4 +1,5 @@
-﻿using AnkiStoryGenerator.ViewModels;
+﻿using AnkiStoryGenerator.Services;
+using AnkiStoryGenerator.ViewModels;
 using Microsoft.Web.WebView2.Core;
 using PropertyChanged;
 using System.Windows;
@@ -38,8 +39,18 @@ namespace AnkiStoryGenerator
 
         private async void LoadFlashcards_OnClick(object sender, RoutedEventArgs e)
         {
+            var ankiService = new AnkiService();
+            var flashcards = ankiService.GetRecentlyReviewedCardsFromSpecificDeck(AnkiService.AnkiDatabaseFilePath, viewModel.DeckName, viewModel.NumRecentFlashcardsToUse);
+
+            this.viewModel.Flashcards.Clear();
+            foreach (var flashcard in flashcards)
+            {
+                this.viewModel.Flashcards.Add(new FlashcardViewModel(flashcard.Question, flashcard.Answer));
+            }
+
             viewModel.ChatGptPrompt = "yo dawg";
             await SetPreviewWindowHtml();
+
         }
     }
 }
