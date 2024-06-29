@@ -1,0 +1,29 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Watch: compile & bundle",
+      "type": "shell",
+      "command": "npx",
+      "args": [
+        "esbuild",
+        "script.ts",
+        "--bundle",
+        "--sourcemap",
+        "--outfile=script.js",
+        "--minify",
+        "--watch",
+        "--platform=browser"
+      ],
+      "problemMatcher": "$tsc-watch",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    }
+  ]
+}
