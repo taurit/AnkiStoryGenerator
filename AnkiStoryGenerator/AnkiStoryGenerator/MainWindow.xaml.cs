@@ -114,17 +114,19 @@ public partial class MainWindow : Window
         // generate story
         ChatCompletion completion = await client.CompleteChatAsync(viewModel.ChatGptPrompt);
         var generatedStoryHtml = completion.Content.First().Text;
+        var generatedStoryHtmlUnwrapped = StringHelpers.TrimBackticksWrapperFromString(generatedStoryHtml);
 
         // translate story
-        var translationPrompt = await GetStoryTranslationPrompt(generatedStoryHtml);
+        var translationPrompt = await GetStoryTranslationPrompt(generatedStoryHtmlUnwrapped);
         ChatCompletion translationCompletion = await client.CompleteChatAsync(translationPrompt);
         var translatedStoryHtml = translationCompletion.Content.First().Text;
+        var translatedStoryHtmlUnwrapped = StringHelpers.TrimBackticksWrapperFromString(translatedStoryHtml);
 
         var chatGptApiQueryCost = (completion.Usage.InputTokens + translationCompletion.Usage.InputTokens) * Settings.InputTokenPrice +
                                   (completion.Usage.OutputTokens + translationCompletion.Usage.OutputTokens) * Settings.OutputTokenPrice;
         Debug.WriteLine("ChatGPT API query cost: $" + chatGptApiQueryCost.ToString("F6"));
 
-        return new GeneratedStory(generatedStoryHtml, translatedStoryHtml);
+        return new GeneratedStory(generatedStoryHtmlUnwrapped, translatedStoryHtmlUnwrapped);
     }
 
     private async Task UpdateChatGptPrompt()
@@ -133,7 +135,10 @@ public partial class MainWindow : Window
         var templatePath = "D:\\Projekty\\AnkiStoryGenerator\\AnkiStoryGenerator\\AnkiStoryGenerator\\Prompts\\GenerateStoryPrompt.sbn";
         var templateContent = await File.ReadAllTextAsync(templatePath);
 
-        var model = new GenerateStoryParametersModel(viewModel.Language, viewModel.Genre, viewModel.PreferredLengthOfAStoryInWords, viewModel.Flashcards);
+        var random = new Random();
+        var randomGenre = new[] { "fantasy", "sci-fi", "mystery", "horror", "romance", "comedy", "crime" }[random.Next(0, 7)];
+
+        var model = new GenerateStoryParametersModel(viewModel.Language, randomGenre, viewModel.PreferredLengthOfAStoryInWords, viewModel.Flashcards);
         var template = ScribanTemplate.Parse(templateContent, templatePath);
 
         viewModel.ChatGptPrompt = await template.RenderAsync(model, x => x.Name);

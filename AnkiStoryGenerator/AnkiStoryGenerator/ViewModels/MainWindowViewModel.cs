@@ -6,12 +6,12 @@ namespace AnkiStoryGenerator.ViewModels;
 [AddINotifyPropertyChangedInterface]
 public class MainWindowViewModel
 {
-    public string Language { get; } = "Spanish"; // hardcoded, but in the future, this could be a dropdown
+    public string Language { get; } = "Spanish (Castillan)"; // hardcoded, but in the future, this could be a dropdown
     public string DeckName { get; } = "1. Spanish"; // hardcoded, but in the future, this could be a dropdown
     public string Genre { get; } = "crime"; // hardcoded, but in the future, this could be a dropdown
 
-    public int NumRecentFlashcardsToUse { get; } = 10;
-    public int PreferredLengthOfAStoryInWords { get; } = 400;
+    public int NumRecentFlashcardsToUse { get; } = 20;
+    public int PreferredLengthOfAStoryInWords { get; } = 200;
 
     public ObservableCollection<FlashcardViewModel> Flashcards { get; set; } = new ObservableCollection<FlashcardViewModel>();
     public string? ChatGptPrompt { get; set; }
