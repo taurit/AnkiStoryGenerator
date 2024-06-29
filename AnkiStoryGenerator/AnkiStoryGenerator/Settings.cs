@@ -20,6 +20,7 @@ public class Settings
 
     // hardcoded for simplicity in the proof-of-concept phase
     public const string TooltipScriptPath = "d:\\Projekty\\AnkiStoryGenerator\\WordExplainerScript\\script.js";
+
     // hardcoded for simplicity in the proof-of-concept phase
     public const string TooltipStylesPath = "d:\\Projekty\\AnkiStoryGenerator\\WordExplainerScript\\script.css";
 
@@ -34,8 +35,10 @@ public class Settings
     {
         var builder = new ConfigurationBuilder().AddUserSecrets<Settings>();
         var configuration = builder.Build();
-        OpenAiDeveloperKey = configuration["OpenAiDeveloperKey"] ?? throw new InvalidOperationException("OpenAiDeveloperKey is missing in User Secrets configuration");
-        OpenAiOrganization = configuration["OpenAiOrganization"] ?? throw new InvalidOperationException("OpenAiOrganization is missing in User Secrets configuration");
+        OpenAiDeveloperKey = configuration["OpenAiDeveloperKey"] ??
+                             throw new InvalidOperationException("OpenAiDeveloperKey is missing in User Secrets configuration");
+        OpenAiOrganization = configuration["OpenAiOrganization"] ??
+                             throw new InvalidOperationException("OpenAiOrganization is missing in User Secrets configuration");
 
         AzureTtsRegion = configuration["AzureTtsRegion"] ?? throw new InvalidOperationException("AzureTtsRegion is missing in User Secrets configuration");
         AzureTtsKey = configuration["AzureTtsKey"] ?? throw new InvalidOperationException("AzureTtsKey is missing in User Secrets configuration");

@@ -55,15 +55,21 @@
                         Foreground="CornflowerBlue">
                         Parameters:
                     </TextBlock>
-                    <TextBlock><Run FontWeight="Bold">Language:</Run><Run Text="&#160;" /><Run Foreground="DarkOrchid" Text="{Binding Language, Mode=OneWay}" />
+                    <TextBlock>
+                        <Run FontWeight="Bold">Language:</Run><Run Text="&#160;" />
+                        <Run Foreground="DarkOrchid" Text="{Binding Language, Mode=OneWay}" />
                     </TextBlock>
-                    <TextBlock><Run FontWeight="Bold">Deck:</Run><Run Text="&#160;" /><Run Foreground="DarkOrchid" Text="{Binding DeckName, Mode=OneWay}" /></TextBlock>
+                    <TextBlock>
+                        <Run FontWeight="Bold">Deck:</Run><Run Text="&#160;" />
+                        <Run Foreground="DarkOrchid" Text="{Binding DeckName, Mode=OneWay}" />
+                    </TextBlock>
                     <TextBlock>
                         <Run FontWeight="Bold" Text="Number of recent flashcards to use:" />
                         <Run Text="&#160;" />
                         <Run Foreground="DarkOrchid" Text="{Binding NumRecentFlashcardsToUse, Mode=OneWay}" />
                     </TextBlock>
-                    <TextBlock><Run FontWeight="Bold" Text="Length of story in words:" /><Run Text="&#160;" />
+                    <TextBlock>
+                        <Run FontWeight="Bold" Text="Length of story in words:" /><Run Text="&#160;" />
                         <Run Foreground="DarkOrchid" Text="{Binding PreferredLengthOfAStoryInWords, Mode=OneWay}" />
                     </TextBlock>
 

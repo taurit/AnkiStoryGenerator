@@ -23,5 +23,4 @@ public sealed class FlashcardViewModel(int id, string question, string answer)
     public int Id { get; } = id;
     public string Question { get; } = question;
     public string Answer { get; } = answer;
-
 }

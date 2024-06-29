@@ -1,4 +1,4 @@
-﻿using AnkiStoryGenerator.Services;
+﻿using AnkiStoryGenerator.Utilities;
 
 namespace AnkiStoryGenerator.Tests;
 
@@ -9,12 +9,12 @@ public class StringHelpersTests
     public void TrimBackticksWrapperFromString_ShouldRemoveBackticksAndContentType_WhenPresent()
     {
         // Arrange
-        string input = @"```html
+        var input = @"```html
 This is a code block
 ```";
 
         // Act
-        string result = StringHelpers.TrimBackticksWrapperFromString(input);
+        var result = StringHelpers.RemoveBackticksBlockWrapper(input);
 
         // Assert
         Assert.AreEqual("This is a code block", result);
@@ -24,14 +24,14 @@ This is a code block
     public void TrimBackticksWrapperFromString_ShouldRemoveBackticksAndContentType_OnlyAtTheEnd()
     {
         // Arrange
-        string input = @"```html
+        var input = @"```html
 This is a code block
 ```
 Some other text
 ```";
 
         // Act
-        string result = StringHelpers.TrimBackticksWrapperFromString(input);
+        var result = StringHelpers.RemoveBackticksBlockWrapper(input);
 
         // Assert
         Assert.AreEqual(@"This is a code block
@@ -44,13 +44,12 @@ Some other text", result);
     public void TrimBackticksWrapperFromString_ShouldNotRemoveAnything_WhenBackticksAndContentTypeNotPresent()
     {
         // Arrange
-        string input = "This is a normal string";
+        var input = "This is a normal string";
 
         // Act
-        string result = StringHelpers.TrimBackticksWrapperFromString(input);
+        var result = StringHelpers.RemoveBackticksBlockWrapper(input);
 
         // Assert
         Assert.AreEqual(input, result);
     }
-
 }

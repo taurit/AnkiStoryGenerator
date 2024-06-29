@@ -1,10 +1,10 @@
 ﻿using HtmlAgilityPack;
 using System.IO;
 
-namespace AnkiStoryGenerator.Services;
+namespace AnkiStoryGenerator.Utilities;
 
 // Source: https://stackoverflow.com/a/1121515/889779
-public class HtmlUtilities
+public static class HtmlHelpers
 {
     /// <summary>
     /// Converts HTML to plain text / strips tags.
@@ -13,43 +13,20 @@ public class HtmlUtilities
     /// <returns></returns>
     public static string ConvertToPlainText(string html)
     {
-        HtmlDocument doc = new HtmlDocument();
+        HtmlDocument doc = new();
         doc.LoadHtml(html);
 
-        StringWriter sw = new StringWriter();
+        StringWriter sw = new();
         ConvertTo(doc.DocumentNode, sw);
         sw.Flush();
         return sw.ToString();
     }
 
-
-    /// <summary>
-    /// Count the words.
-    /// The content has to be converted to plain text before (using ConvertToPlainText).
-    /// </summary>
-    /// <param name="plainText">The plain text.</param>
-    /// <returns></returns>
-    public static int CountWords(string plainText)
-    {
-        return !String.IsNullOrEmpty(plainText) ? plainText.Split(' ', '\n').Length : 0;
-    }
-
-
-    public static string Cut(string text, int length)
-    {
-        if (!String.IsNullOrEmpty(text) && text.Length > length)
-        {
-            text = text.Substring(0, length - 4) + " ...";
-        }
-        return text;
-    }
-
-
     private static void ConvertContentTo(HtmlNode node, TextWriter outText)
     {
-        foreach (HtmlNode subnode in node.ChildNodes)
+        foreach (var subNode in node.ChildNodes)
         {
-            ConvertTo(subnode, outText);
+            ConvertTo(subNode, outText);
         }
     }
 
@@ -69,8 +46,8 @@ public class HtmlUtilities
 
             case HtmlNodeType.Text:
                 // script and style must not be output
-                string parentName = node.ParentNode.Name;
-                if ((parentName == "script") || (parentName == "style") || (parentName == "title"))
+                var parentName = node.ParentNode.Name;
+                if (parentName == "script" || parentName == "style" || parentName == "title")
                     break;
 
                 // get text
@@ -85,6 +62,7 @@ public class HtmlUtilities
                 {
                     outText.Write(HtmlEntity.DeEntitize(html));
                 }
+
                 break;
 
             case HtmlNodeType.Element:
@@ -103,6 +81,7 @@ public class HtmlUtilities
                 {
                     ConvertContentTo(node, outText);
                 }
+
                 break;
         }
     }

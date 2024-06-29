@@ -1,13 +1,13 @@
 ﻿using System.Data.SQLite;
 
-namespace AnkiStoryGenerator.Services;
+namespace AnkiStoryGenerator.Utilities;
 
 public record Flashcard(string Question, string Answer);
 
 /// <summary>
 /// Allows to read relevant data from Anki's SQLite database and returns them as .NET objects.
 /// </summary>
-public class AnkiService
+public static class AnkiHelpers
 {
     // Path to Anki database. Todo: this is only hardcoded in proof-of-concept phase. In the future, this should be configurable.
     public const string AnkiDatabaseFilePath = "d:\\Projekty\\AnkiStoryGenerator\\LocalDevData\\collection.anki2";
@@ -19,7 +19,7 @@ public class AnkiService
     /// <param name="deckName">Name of the deck serving as a filter for which flashcards to retrieve.</param>
     /// <param name="numRecentCardsToFetch">A number of cards to fetch.</param>
     /// <returns></returns>
-    public List<Flashcard> GetRecentlyReviewedCardsFromSpecificDeck(string databaseFilePath, string deckName, int numRecentCardsToFetch)
+    public static List<Flashcard> GetRecentlyReviewedCardsFromSpecificDeck(string databaseFilePath, string deckName, int numRecentCardsToFetch)
     {
         using var connection = new SQLiteConnection($"Data Source={databaseFilePath};Version=3;");
         connection.Open();

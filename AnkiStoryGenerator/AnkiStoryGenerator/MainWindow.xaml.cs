@@ -1,4 +1,4 @@
-﻿using AnkiStoryGenerator.Services;
+﻿using AnkiStoryGenerator.Utilities;
 using AnkiStoryGenerator.ViewModels;
 using Microsoft.Web.WebView2.Core;
 using Microsoft.Web.WebView2.Wpf;
@@ -21,21 +21,20 @@ namespace AnkiStoryGenerator;
 [AddINotifyPropertyChangedInterface]
 public partial class MainWindow : Window
 {
-    MainWindowViewModel viewModel = new MainWindowViewModel();
-    private string? latestStoryHtml;
+    private readonly MainWindowViewModel _viewModel = new();
+    private string? _latestStoryHtml;
 
     public MainWindow()
     {
-        DataContext = viewModel;
+        DataContext = _viewModel;
         InitializeComponent();
     }
 
-    public async Task SetPreviewWindowHtml(WebView2 webViewControl, string htmlContentToSet)
+    private static async Task SetPreviewWindowHtml(WebView2 webViewControl, string htmlContentToSet)
     {
         // Ensure that CoreWebView2 is initialized
         if (webViewControl.Source is null)
         {
-
             var options = new CoreWebView2EnvironmentOptions();
             var environment = await CoreWebView2Environment.CreateAsync(null, null, options);
             await webViewControl.EnsureCoreWebView2Async(environment);
@@ -46,15 +45,16 @@ public partial class MainWindow : Window
 
     private async void LoadFlashcards_OnClick(object sender, RoutedEventArgs e)
     {
-        var ankiService = new AnkiService();
-        var flashcards = ankiService.GetRecentlyReviewedCardsFromSpecificDeck(AnkiService.AnkiDatabaseFilePath, viewModel.DeckName, viewModel.NumRecentFlashcardsToUse);
+        var flashcards =
+            AnkiHelpers.GetRecentlyReviewedCardsFromSpecificDeck(AnkiHelpers.AnkiDatabaseFilePath, _viewModel.DeckName, _viewModel.NumRecentFlashcardsToUse);
 
-        this.viewModel.Flashcards.Clear();
-        int locallyUniqueId = 1;
+        this._viewModel.Flashcards.Clear();
+        var locallyUniqueId = 1;
         foreach (var flashcard in flashcards)
         {
-            this.viewModel.Flashcards.Add(new FlashcardViewModel(locallyUniqueId++, flashcard.Question, flashcard.Answer));
+            this._viewModel.Flashcards.Add(new FlashcardViewModel(locallyUniqueId++, flashcard.Question, flashcard.Answer));
         }
+
         await UpdateChatGptPrompt();
     }
 
@@ -62,16 +62,16 @@ public partial class MainWindow : Window
     {
         var story = await GenerateStoryUsingChatGptApi();
 
-        this.latestStoryHtml = story.OriginalHtml;
+        this._latestStoryHtml = story.OriginalHtml;
 
-        var storyHtmlWithTooltips = AddTooltipsForFlashcardWords(story.OriginalHtml, viewModel.Flashcards);
-        var translationHtmlWithTooltips = AddTooltipsForFlashcardWords(story.TranslatedHtml, viewModel.Flashcards);
+        var storyHtmlWithTooltips = AddTooltipsForFlashcardWords(story.OriginalHtml, _viewModel.Flashcards);
+        var translationHtmlWithTooltips = AddTooltipsForFlashcardWords(story.TranslatedHtml, _viewModel.Flashcards);
 
         await SetPreviewWindowHtml(WebViewControlOriginal, storyHtmlWithTooltips);
         await SetPreviewWindowHtml(WebViewControlTranslation, translationHtmlWithTooltips);
     }
 
-    private string AddTooltipsForFlashcardWords(string openAiResponse, ObservableCollection<FlashcardViewModel> viewModelFlashcards)
+    private static string AddTooltipsForFlashcardWords(string openAiResponse, ObservableCollection<FlashcardViewModel> viewModelFlashcards)
     {
         // OpenAi was asked to respond with a story with basic HTML markup: paragraphs, and requested words highlighted with `<b data-id="{WordNumericId}"></b>`.
         // Now we need to:
@@ -112,15 +112,15 @@ public partial class MainWindow : Window
         ChatClient client = new(model: Settings.OpenAiModelId, new ApiKeyCredential(appSettings.OpenAiDeveloperKey), openAiClientOptions);
 
         // generate story
-        ChatCompletion completion = await client.CompleteChatAsync(viewModel.ChatGptPrompt);
-        var generatedStoryHtml = completion.Content.First().Text;
-        var generatedStoryHtmlUnwrapped = StringHelpers.TrimBackticksWrapperFromString(generatedStoryHtml);
+        ChatCompletion completion = await client.CompleteChatAsync(_viewModel.ChatGptPrompt);
+        var generatedStoryHtml = completion.Content[0].Text;
+        var generatedStoryHtmlUnwrapped = StringHelpers.RemoveBackticksBlockWrapper(generatedStoryHtml);
 
         // translate story
         var translationPrompt = await GetStoryTranslationPrompt(generatedStoryHtmlUnwrapped);
         ChatCompletion translationCompletion = await client.CompleteChatAsync(translationPrompt);
-        var translatedStoryHtml = translationCompletion.Content.First().Text;
-        var translatedStoryHtmlUnwrapped = StringHelpers.TrimBackticksWrapperFromString(translatedStoryHtml);
+        var translatedStoryHtml = translationCompletion.Content[0].Text;
+        var translatedStoryHtmlUnwrapped = StringHelpers.RemoveBackticksBlockWrapper(translatedStoryHtml);
 
         var chatGptApiQueryCost = (completion.Usage.InputTokens + translationCompletion.Usage.InputTokens) * Settings.InputTokenPrice +
                                   (completion.Usage.OutputTokens + translationCompletion.Usage.OutputTokens) * Settings.OutputTokenPrice;
@@ -138,10 +138,10 @@ public partial class MainWindow : Window
         var random = new Random();
         var randomGenre = new[] { "fantasy", "sci-fi", "mystery", "horror", "romance", "comedy", "crime" }[random.Next(0, 7)];
 
-        var model = new GenerateStoryParametersModel(viewModel.Language, randomGenre, viewModel.PreferredLengthOfAStoryInWords, viewModel.Flashcards);
+        var model = new GenerateStoryParametersModel(_viewModel.Language, randomGenre, _viewModel.PreferredLengthOfAStoryInWords, _viewModel.Flashcards);
         var template = ScribanTemplate.Parse(templateContent, templatePath);
 
-        viewModel.ChatGptPrompt = await template.RenderAsync(model, x => x.Name);
+        _viewModel.ChatGptPrompt = await template.RenderAsync(model, x => x.Name);
     }
 
     private async Task<string> GetStoryTranslationPrompt(string originalStoryHtml)
@@ -149,7 +149,7 @@ public partial class MainWindow : Window
         var templatePath = "D:\\Projekty\\AnkiStoryGenerator\\AnkiStoryGenerator\\AnkiStoryGenerator\\Prompts\\TranslateStoryPrompt.sbn";
         var templateContent = await File.ReadAllTextAsync(templatePath);
 
-        var model = new TranslateStoryParametersModel(viewModel.Language, "Polish", originalStoryHtml);
+        var model = new TranslateStoryParametersModel(_viewModel.Language, "Polish", originalStoryHtml);
         var template = ScribanTemplate.Parse(templateContent, templatePath);
 
         var translationPrompt = await template.RenderAsync(model, x => x.Name);
@@ -158,24 +158,21 @@ public partial class MainWindow : Window
 
     private async void PlayStory_OnClick(object sender, RoutedEventArgs e)
     {
-        if (this.latestStoryHtml is null)
+        if (this._latestStoryHtml is null)
         {
             MessageBox.Show("Please generate a story first.");
             return;
         }
 
-        var storyInPlainText = HtmlUtilities.ConvertToPlainText(this.latestStoryHtml);
+        var storyInPlainText = HtmlHelpers.ConvertToPlainText(this._latestStoryHtml);
         // todo add some caching
         var ttsAudio = await SynthesizeTextToSpeech(storyInPlainText);
         await File.WriteAllBytesAsync("d:/testAAA.mp3", ttsAudio);
-        var startInfo = new ProcessStartInfo("d:/testAAA.mp3")
-        {
-            UseShellExecute = true
-        };
+        var startInfo = new ProcessStartInfo("d:/testAAA.mp3") { UseShellExecute = true };
         Process.Start(startInfo);
     }
 
-    private async Task<byte[]> SynthesizeTextToSpeech(string text)
+    private static async Task<byte[]> SynthesizeTextToSpeech(string text)
     {
         var settings = new Settings();
 
@@ -205,10 +202,14 @@ public partial class MainWindow : Window
         await audioStream.CopyToAsync(memoryStream);
         return memoryStream.ToArray();
     }
-
-
 }
 
-internal record GenerateStoryParametersModel(string Language, string Genre, int PreferredLengthOfAStoryInWords, ObservableCollection<FlashcardViewModel> Flashcards);
+internal record GenerateStoryParametersModel(
+    string Language,
+    string Genre,
+    int PreferredLengthOfAStoryInWords,
+    ObservableCollection<FlashcardViewModel> Flashcards);
+
 internal record TranslateStoryParametersModel(string FromLanguage, string ToLanguage, string InputHtml);
+
 internal record GeneratedStory(string OriginalHtml, string TranslatedHtml);
