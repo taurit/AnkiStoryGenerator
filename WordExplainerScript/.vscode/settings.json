@@ -1,0 +1,12 @@
+{
+  "files.exclude": {
+    "*.css.map": true,
+    "*.js.map": true,
+    "package-lock.json": true,
+    "script.css": true,
+    "script.js": true
+  },
+  "search.exclude": {
+    "*.map": true
+  }
+}

@@ -83,7 +83,7 @@ namespace AnkiStoryGenerator
             const double gpt4OOutputTokenPrice = (15.0 / 1_000_000);
             var chatGptApiQueryCost = completion.Usage.InputTokens * gpt4OInputTokenPrice + completion.Usage.OutputTokens * gpt4OOutputTokenPrice;
 
-            Debug.WriteLine("Raw HTML response: $" + openAiResponse);
+            Debug.WriteLine("Raw HTML response: " + openAiResponse);
 
             Debug.WriteLine("ChatGPT input tokens used: " + completion.Usage.InputTokens);
             Debug.WriteLine("ChatGPT output tokens used: " + completion.Usage.OutputTokens);

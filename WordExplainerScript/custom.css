@@ -1,0 +1,13 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 16px;
+}
+
+.tippy-box[data-theme~='myCustomTheme'] {
+    border: 3px solid #4CCD99;
+    background-color: #E2F4C5;
+    color: black;
+    box-shadow: 0 0 10px #4CCD99;
+
+    padding: 6px;
+}

@@ -1,12 +1,16 @@
-import swal from "sweetalert";
+import tippy from "tippy.js";
+import "tippy.js/dist/tippy.css";
+import "./custom.css";
 
 document.addEventListener("DOMContentLoaded", () => {
-  document.querySelectorAll("[data-id]").forEach((word) => {
-    (word as HTMLElement).addEventListener("click", (event: MouseEvent) => {
-      const target = event.target as HTMLElement;
-      if (target && target.textContent) {
-        swal("Here's the title!", `Word: ${target.textContent}`);
-      }
-    });
+  tippy("[data-id]", {
+    allowHTML: true,
+    arrow: false,
+    animation: "none",
+    theme: "myCustomTheme",
+    content(reference) {
+      const tooltip = reference.getAttribute("data-tooltip");
+      return tooltip ? tooltip : "[data-tooltip attribute is missing]";
+    },
   });
 });
