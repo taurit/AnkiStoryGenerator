@@ -4,6 +4,21 @@ namespace AnkiStoryGenerator;
 
 public class Settings
 {
+#if DEBUG
+    public const string OpenAiModelId = "gpt-3.5-turbo";
+    public const double InputTokenPrice = (0.5 / 1_000_000);
+    public const double OutputTokenPrice = (1.5 / 1_000_000);
+#else
+    public const string OpenAiModelId = "gpt-4o";
+    public const double InputTokenPrice = (5.0 / 1_000_000);
+    public const double OutputTokenPrice = (15.0 / 1_000_000);
+#endif
+
+    // hardcoded for simplicity in the proof-of-concept phase
+    public const string TooltipScriptPath = "d:\\Projekty\\AnkiStoryGenerator\\WordExplainerScript\\script.js";
+    // hardcoded for simplicity in the proof-of-concept phase
+    public const string TooltipStylesPath = "d:\\Projekty\\AnkiStoryGenerator\\WordExplainerScript\\script.css";
+
     public readonly string OpenAiDeveloperKey;
     public readonly string OpenAiOrganization;
 

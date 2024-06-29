@@ -112,6 +112,7 @@
 
             <TextBox
                 Grid.Row="0"
+                Margin="0,0,10,0"
                 IsReadOnly="True"
                 Text="{Binding ChatGptPrompt, Mode=OneWay}"
                 TextWrapping="Wrap" />
@@ -119,8 +120,39 @@
             <GridSplitter
                 Grid.Row="1"
                 Height="10"
+                HorizontalAlignment="Stretch"
                 ResizeBehavior="PreviousAndNext" />
-            <wpf:WebView2 Name="WebViewControl" Grid.Row="2" />
+
+            <Grid Grid.Row="2">
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Border
+                    Margin="0,0,0,10"
+                    BorderBrush="DarkGray"
+                    BorderThickness="1">
+                    <wpf:WebView2 Name="WebViewControlOriginal" />
+                </Border>
+
+                <GridSplitter
+                    Grid.Column="1"
+                    Width="10"
+                    ResizeBehavior="PreviousAndNext" />
+
+                <Border
+                    Grid.Column="2"
+                    Margin="0,0,10,10"
+                    BorderBrush="DarkGray"
+                    BorderThickness="1">
+                    <wpf:WebView2 Name="WebViewControlTranslation" />
+                </Border>
+
+
+            </Grid>
         </Grid>
     </Grid>
 </Window>

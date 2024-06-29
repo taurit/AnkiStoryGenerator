@@ -1,0 +1,6 @@
+﻿Translate the following short story from {{FromLanguage}} to {{ToLanguage}}.
+Preserve all HTML tags and attributes as-is, only translate the text content.
+Make the translation as literal as possible. It should be true translation, doesn't have to be beautiful. If you can preserve the order of words without straining rules of grammar too much, even better.
+
+Here is the input text to translate:
+{{InputHtml}}

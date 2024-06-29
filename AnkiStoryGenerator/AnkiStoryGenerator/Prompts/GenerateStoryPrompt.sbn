@@ -1,6 +1,6 @@
 ﻿Generate a short story in the {{Genre}} genre in {{Language}} to help students review words they recently learned. Aim for a length of {{PreferredLengthOfAStoryInWords}} words.
 
-The story should generally use basic vocabulary (A1 level) and should aim to include all of the words explicitly listed at the end of this prompt (which might have varying difficulty). The words from the provided list can be included in any order, and any number of times, ideally in various tenses and conjugated to multiple forms. The goal is to help readers repeat them and see them in context.
+The story should generally use basic vocabulary (A1 level) and should aim to include all of the words explicitly listed at the end of this prompt (which might have varying difficulty). The words from the provided list can be included in any order, and any number of times, ideally in various tenses and conjugated to multiple forms. If words have more than one meaning, only use it with the meaning hinted by the word translation. The goal is to help readers repeat specific words with specific meaning and see them in context.
 
 Please try to limit the tenses and grammar forms to:
 - Presente
@@ -8,12 +8,12 @@ Please try to limit the tenses and grammar forms to:
 - Presente Progresivo
 - Common forms like `ir a` when talking about future
 
-But avoid using the following tenses, since students don't know them yet:
+However, the story should not use the following tenses, since students don't know them yet:
 - Preterit
 - Futuro
 
-The output should be in HTML format. Don't rely on newline characters, but place paragraphs within `<p></p>` tags. Highlight words from the given list in all their forms by wrapping them in `<b data-id="{WordId}"></b>` tags.
+The output should be in HTML format. Don't rely on newline characters, but place paragraphs within `<p></p>` tags. Highlight words from the given list in all their forms by wrapping them in `<b data-id="{WordNumericId}"></b>` tags.
 
-Here is the list of words to include in the format: `- {WordId};{Word in {{Language}}};{Translation to Polish}. The data is imported from flashcards, so its a bit unstructured. If some words or phrases are unclear, skip them:
+Here is the list of words to include in the format: `- {WordNumericId};{Word in {{Language}}};{Translation to Polish}. The data is imported from flashcards, so its a bit unstructured. If some words or phrases are unclear, skip them:
 {{ for flashcard in Flashcards }}- {{flashcard.Id}};{{flashcard.Answer}};{{flashcard.Question}}
 {{ end }}
