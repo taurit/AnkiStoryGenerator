@@ -22,15 +22,26 @@
             Grid.Column="0"
             Margin="10"
             LastChildFill="True">
-            <Button
-                Name="GenerateStory"
-                Padding="15"
-                Click="GenerateStory_OnClick"
+            <UniformGrid
+                Columns="2"
                 DockPanel.Dock="Bottom"
-                FontWeight="Bold"
-                IsDefault="True">
-                Generate a story!
-            </Button>
+                Rows="1">
+                <Button
+                    Name="GenerateStory"
+                    Margin="0,0,5,0"
+                    Padding="15"
+                    Click="GenerateStory_OnClick">
+                    Generate a story!
+                </Button>
+                <Button
+                    Name="PlayStory"
+                    Margin="5,0,0,0"
+                    Padding="15"
+                    Click="PlayStory_OnClick">
+                    Play as audio
+                </Button>
+            </UniformGrid>
+
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />

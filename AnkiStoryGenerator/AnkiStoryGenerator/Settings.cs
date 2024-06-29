@@ -22,15 +22,18 @@ public class Settings
     public readonly string OpenAiDeveloperKey;
     public readonly string OpenAiOrganization;
 
+    public readonly string AzureTtsRegion;
+    public readonly string AzureTtsKey;
+
+
     public Settings()
     {
         var builder = new ConfigurationBuilder().AddUserSecrets<Settings>();
         var configuration = builder.Build();
-        OpenAiDeveloperKey = configuration["OpenAiDeveloperKey"] ??
-                             throw new InvalidOperationException(
-                                 "OpenAiDeveloperKey is missing in User Secrets configuration");
-        OpenAiOrganization = configuration["OpenAiOrganization"] ??
-                             throw new InvalidOperationException(
-                                 "OpenAiOrganization is missing in User Secrets configuration");
+        OpenAiDeveloperKey = configuration["OpenAiDeveloperKey"] ?? throw new InvalidOperationException("OpenAiDeveloperKey is missing in User Secrets configuration");
+        OpenAiOrganization = configuration["OpenAiOrganization"] ?? throw new InvalidOperationException("OpenAiOrganization is missing in User Secrets configuration");
+
+        AzureTtsRegion = configuration["AzureTtsRegion"] ?? throw new InvalidOperationException("AzureTtsRegion is missing in User Secrets configuration");
+        AzureTtsKey = configuration["AzureTtsKey"] ?? throw new InvalidOperationException("AzureTtsKey is missing in User Secrets configuration");
     }
 }
