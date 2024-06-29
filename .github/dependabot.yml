@@ -17,3 +17,12 @@ updates:
           github-actions-dependencies:
               patterns:
                   - "*"
+                  
+    - package-ecosystem: "npm"
+        directory: "/WordExplainerScript"
+        schedule:
+        interval: "monthly"
+        groups:
+            github-actions-dependencies:
+                patterns:
+                - "*"
