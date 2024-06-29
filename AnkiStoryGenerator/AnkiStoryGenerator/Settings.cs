@@ -24,6 +24,9 @@ public class Settings
     // hardcoded for simplicity in the proof-of-concept phase
     public const string TooltipStylesPath = "d:\\Projekty\\AnkiStoryGenerator\\WordExplainerScript\\script.css";
 
+    // hardcoded for simplicity in the proof-of-concept phase
+    public const string AnkiDatabaseFilePath = "d:\\Projekty\\AnkiStoryGenerator\\LocalDevData\\collection.anki2";
+
     public readonly string OpenAiDeveloperKey;
     public readonly string OpenAiOrganization;
 

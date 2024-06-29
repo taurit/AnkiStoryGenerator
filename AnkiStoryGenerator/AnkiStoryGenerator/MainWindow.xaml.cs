@@ -9,7 +9,6 @@ using System.ClientModel;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
-using System.Net.Http;
 using System.Windows;
 using ScribanTemplate = Scriban.Template;
 
@@ -46,7 +45,7 @@ public partial class MainWindow : Window
     private async void LoadFlashcards_OnClick(object sender, RoutedEventArgs e)
     {
         var flashcards =
-            AnkiHelpers.GetRecentlyReviewedCardsFromSpecificDeck(AnkiHelpers.AnkiDatabaseFilePath, _viewModel.DeckName, _viewModel.NumRecentFlashcardsToUse);
+            AnkiHelpers.GetRecentlyReviewedCardsFromSpecificDeck(Settings.AnkiDatabaseFilePath, _viewModel.DeckName, _viewModel.NumRecentFlashcardsToUse);
 
         this._viewModel.Flashcards.Clear();
         var locallyUniqueId = 1;
@@ -131,8 +130,7 @@ public partial class MainWindow : Window
 
     private async Task UpdateChatGptPrompt()
     {
-        // hardcoded for faster feedback loop
-        var templatePath = "D:\\Projekty\\AnkiStoryGenerator\\AnkiStoryGenerator\\AnkiStoryGenerator\\Prompts\\GenerateStoryPrompt.sbn";
+        var templatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Prompts\\GenerateStoryPrompt.sbn");
         var templateContent = await File.ReadAllTextAsync(templatePath);
 
         var random = new Random();
@@ -146,7 +144,7 @@ public partial class MainWindow : Window
 
     private async Task<string> GetStoryTranslationPrompt(string originalStoryHtml)
     {
-        var templatePath = "D:\\Projekty\\AnkiStoryGenerator\\AnkiStoryGenerator\\AnkiStoryGenerator\\Prompts\\TranslateStoryPrompt.sbn";
+        var templatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Prompts\\TranslateStoryPrompt.sbn");
         var templateContent = await File.ReadAllTextAsync(templatePath);
 
         var model = new TranslateStoryParametersModel(_viewModel.Language, "Polish", originalStoryHtml);
@@ -166,42 +164,14 @@ public partial class MainWindow : Window
 
         var storyInPlainText = HtmlHelpers.ConvertToPlainText(this._latestStoryHtml);
         // todo add some caching
-        var ttsAudio = await SynthesizeTextToSpeech(storyInPlainText);
+        var ttsAudio = await TextToSpeechHelpers.SynthesizeTextToSpeech(storyInPlainText);
+
+        // todo save to some temporary directory, cache...
         await File.WriteAllBytesAsync("d:/testAAA.mp3", ttsAudio);
         var startInfo = new ProcessStartInfo("d:/testAAA.mp3") { UseShellExecute = true };
         Process.Start(startInfo);
     }
 
-    private static async Task<byte[]> SynthesizeTextToSpeech(string text)
-    {
-        var settings = new Settings();
-
-        var endpoint = $"https://{settings.AzureTtsRegion}.tts.speech.microsoft.com/cognitiveservices/v1";
-
-        using var client = new HttpClient();
-        client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", settings.AzureTtsKey);
-        client.DefaultRequestHeaders.Add("User-Agent", "AnkiStoryGenerator");
-        client.DefaultRequestHeaders.Add("X-Microsoft-OutputFormat", "audio-16khz-128kbitrate-mono-mp3");
-
-        var requestBody = $@"<speak version='1.0' xmlns='http://www.w3.org/2001/10/synthesis' xml:lang='es-ES'>
-                                            <voice xml:lang='es-ES' xml:gender='Female' name='es-ES-TrianaNeural'>
-                                                <prosody rate='0.8'>
-                                                   {text}
-                                                </prosody>
-                                            </voice>
-                                        </speak>";
-
-        using var request = new HttpRequestMessage(HttpMethod.Post, endpoint);
-        request.Content = new StringContent(requestBody, System.Text.Encoding.UTF8, "application/ssml+xml");
-
-        var response = await client.SendAsync(request);
-        response.EnsureSuccessStatusCode();
-
-        var audioStream = await response.Content.ReadAsStreamAsync();
-        using var memoryStream = new MemoryStream();
-        await audioStream.CopyToAsync(memoryStream);
-        return memoryStream.ToArray();
-    }
 }
 
 internal record GenerateStoryParametersModel(

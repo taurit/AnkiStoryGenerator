@@ -9,9 +9,6 @@ public record Flashcard(string Question, string Answer);
 /// </summary>
 public static class AnkiHelpers
 {
-    // Path to Anki database. Todo: this is only hardcoded in proof-of-concept phase. In the future, this should be configurable.
-    public const string AnkiDatabaseFilePath = "d:\\Projekty\\AnkiStoryGenerator\\LocalDevData\\collection.anki2";
-
     /// <summary>
     /// Returns a list of flashcards that were recently reviewed by user.
     /// </summary>

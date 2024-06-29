@@ -33,7 +33,6 @@ public static class HtmlHelpers
 
     private static void ConvertTo(HtmlNode node, TextWriter outText)
     {
-        string html;
         switch (node.NodeType)
         {
             case HtmlNodeType.Comment:
@@ -51,7 +50,7 @@ public static class HtmlHelpers
                     break;
 
                 // get text
-                html = ((HtmlTextNode)node).Text;
+                var html = ((HtmlTextNode)node).Text;
 
                 // is it in fact a special closing node output as text?
                 if (HtmlNode.IsOverlappedClosingElement(html))
