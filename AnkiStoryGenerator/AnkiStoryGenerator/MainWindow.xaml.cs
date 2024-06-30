@@ -111,19 +111,33 @@ public partial class MainWindow : Window
         ChatClient client = new(model: Settings.OpenAiModelId, new ApiKeyCredential(appSettings.OpenAiDeveloperKey), openAiClientOptions);
 
         // generate story
-        ChatCompletion completion = await client.CompleteChatAsync(_viewModel.ChatGptPrompt);
-        var generatedStoryHtml = completion.Content[0].Text;
+        var storyCacheFileName = $"{Settings.OpenAiModelId}_{(_viewModel.ChatGptPrompt ?? "").GetHashCode()}.txt";
+        var storyCacheFilePath = Path.Combine(Settings.GptResponseCacheDirectory, storyCacheFileName);
+
+        if (!File.Exists(storyCacheFilePath))
+        {
+            ChatCompletion completion = await client.CompleteChatAsync(_viewModel.ChatGptPrompt);
+            var generatedStoryHtmlToSave = completion.Content[0].Text;
+            await File.WriteAllTextAsync(storyCacheFilePath, generatedStoryHtmlToSave);
+        }
+
+        var generatedStoryHtml = await File.ReadAllTextAsync(storyCacheFilePath);
         var generatedStoryHtmlUnwrapped = StringHelpers.RemoveBackticksBlockWrapper(generatedStoryHtml);
 
         // translate story
         var translationPrompt = await GetStoryTranslationPrompt(generatedStoryHtmlUnwrapped);
-        ChatCompletion translationCompletion = await client.CompleteChatAsync(translationPrompt);
-        var translatedStoryHtml = translationCompletion.Content[0].Text;
-        var translatedStoryHtmlUnwrapped = StringHelpers.RemoveBackticksBlockWrapper(translatedStoryHtml);
 
-        var chatGptApiQueryCost = (completion.Usage.InputTokens + translationCompletion.Usage.InputTokens) * Settings.InputTokenPrice +
-                                  (completion.Usage.OutputTokens + translationCompletion.Usage.OutputTokens) * Settings.OutputTokenPrice;
-        Debug.WriteLine("ChatGPT API query cost: $" + chatGptApiQueryCost.ToString("F6"));
+        var translationCacheFileName = $"{Settings.OpenAiModelId}_{(translationPrompt ?? "").GetHashCode()}.txt";
+        var translationCacheFilePath = Path.Combine(Settings.GptResponseCacheDirectory, translationCacheFileName);
+
+        if (!File.Exists(translationCacheFilePath))
+        {
+            ChatCompletion translationCompletion = await client.CompleteChatAsync(translationPrompt);
+            var translatedStoryHtmlToSave = translationCompletion.Content[0].Text;
+            await File.WriteAllTextAsync(translationCacheFilePath, translatedStoryHtmlToSave);
+        }
+        var translatedStoryHtml = await File.ReadAllTextAsync(translationCacheFilePath);
+        var translatedStoryHtmlUnwrapped = StringHelpers.RemoveBackticksBlockWrapper(translatedStoryHtml);
 
         return new GeneratedStory(generatedStoryHtmlUnwrapped, translatedStoryHtmlUnwrapped);
     }

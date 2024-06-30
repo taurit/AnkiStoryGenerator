@@ -6,16 +6,11 @@ public class Settings
 {
 #if !DEBUG
     public const string OpenAiModelId = "gpt-3.5-turbo";
-    public const double InputTokenPrice = (0.5 / 1_000_000);
-    public const double OutputTokenPrice = (1.5 / 1_000_000);
 #else
     public const string OpenAiModelId = "gpt-4o";
 
     // Requires some blind test, but at first glance, stories generated with GPT-4 seem constructed much better (although latency is high and cost much higher). This contradicts marketing claims that GPT-4o is better than GPT-4.
     // public const string OpenAiModelId = "gpt-4"; 
-
-    public const double InputTokenPrice = (5.0 / 1_000_000);
-    public const double OutputTokenPrice = (15.0 / 1_000_000);
 #endif
 
     // hardcoded for simplicity in the proof-of-concept phase
