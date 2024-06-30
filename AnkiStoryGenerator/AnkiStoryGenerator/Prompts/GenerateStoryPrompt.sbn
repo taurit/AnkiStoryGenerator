@@ -1,10 +1,10 @@
 ﻿Generate a short story in the {{Genre}} genre. The story should be in {{Language}}.
 
-The narration should only use Present Tense and not use past of future tenses, even if it's not natural for stories to tell them in the present tense. The allowed exceptions to this rule is to allow sentences using Pretérito Perfecto and Presente Progresivo tenses.
+The narration should only use present tense and not use past of future tenses, even if it's not natural for stories to tell them in the present tense.
 
 Aim for a length of {{PreferredLengthOfAStoryInWords}} words.
 
-The story should generally use basic vocabulary (A1 level) and should aim to include all of the words explicitly listed at the end of this prompt (which might have varying difficulty). The words from the provided list can be included in any order, and any number of times, and their conjunction is allowed. If words have more than one meaning, only use word's meaning hinted by the `TranslationToPolish` column.
+The story should generally use basic vocabulary (A1 level) and should aim to include all of the words explicitly listed at the end of this prompt (which might have varying difficulty). The words from the provided list can be included in any order, and any number of times, and their conjunction is allowed. If words have more than one meaning, only use word's meaning hinted by the `TranslationTo{{HintLanguage}}` column.
 
 The output should be in HTML format. Don't rely on newline characters, but place paragraphs within `<p></p>` tags. Highlight words from the given list in all their forms by wrapping them in `<b data-id="WordNumericId"></b>` tags where `WordNumericId` is provided along with the word. The story should begin with a title, wrapped in the `<h1></h1>` tag.
 
@@ -13,6 +13,6 @@ Review and refine the generated content to make it sounds most natural to a nati
 Below comes the list of words to include. The data is imported from flashcards, so its a bit unstructured and might be wrong sometimes. If some words or phrases are unclear, or the line is not a correct CSV line, just skip it:
 
 ```csv
-WordNumericId;WordIn{{Language}};TranslationToPolish
-{{ for flashcard in Flashcards }}{{flashcard.Id}};{{flashcard.Answer}};{{flashcard.Question}}
+WordNumericId;WordIn{{Language}};TranslationTo{{HintLanguage}}
+{{ for flashcard in Flashcards }}{{flashcard.Id | regex.replace ";" "," }};{{flashcard.WordInLearnedLanguage | regex.replace ";" "," }};{{flashcard.WordInNativeLanguage | regex.replace ";" "," }}
 {{ end }}```

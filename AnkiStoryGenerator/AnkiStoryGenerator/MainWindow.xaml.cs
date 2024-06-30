@@ -46,12 +46,14 @@ public partial class MainWindow : Window
     {
         var flashcards =
             AnkiHelpers.GetRecentlyReviewedCardsFromSpecificDeck(Settings.AnkiDatabaseFilePath, _viewModel.DeckName, _viewModel.NumRecentFlashcardsToUse);
+        var sanitizedFlashcards = FlashcardContentHelper.HeuristicallySanitizeFlashcards(flashcards);
 
         this._viewModel.Flashcards.Clear();
         var locallyUniqueId = 1;
-        foreach (var flashcard in flashcards)
+        foreach (var flashcard in sanitizedFlashcards)
         {
-            this._viewModel.Flashcards.Add(new FlashcardViewModel(locallyUniqueId++, flashcard.Question, flashcard.Answer));
+            var flashcardViewModel = new FlashcardViewModel(locallyUniqueId++, flashcard.WordInLearnedLanguage, flashcard.WordInUserNativeLanguage);
+            this._viewModel.Flashcards.Add(flashcardViewModel);
         }
 
         await UpdateChatGptPrompt();
@@ -81,7 +83,7 @@ public partial class MainWindow : Window
 
         foreach (var flashcard in viewModelFlashcards)
         {
-            var tooltipContent = $"{flashcard.Answer}<hr />{flashcard.Question}";
+            var tooltipContent = $"{flashcard.WordInNativeLanguage}<hr />{flashcard.WordInLearnedLanguage}";
             story = story.Replace($"data-id=\"{flashcard.Id}\"", $"data-id=\"{flashcard.Id}\" data-tooltip=\"{tooltipContent}\"");
         }
 
@@ -150,7 +152,7 @@ public partial class MainWindow : Window
         var random = new Random();
         var randomGenre = new[] { "fantasy", "sci-fi", "mystery", "horror", "romance", "comedy", "crime" }[random.Next(0, 7)];
 
-        var model = new GenerateStoryParametersModel(_viewModel.Language, randomGenre, _viewModel.PreferredLengthOfAStoryInWords, _viewModel.Flashcards);
+        var model = new GenerateStoryParametersModel(_viewModel.LearnedLanguage, _viewModel.NativeLanguage, randomGenre, _viewModel.PreferredLengthOfAStoryInWords, _viewModel.Flashcards);
         var template = ScribanTemplate.Parse(templateContent, templatePath);
 
         _viewModel.ChatGptPrompt = await template.RenderAsync(model, x => x.Name);
@@ -161,7 +163,7 @@ public partial class MainWindow : Window
         var templatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Prompts\\TranslateStoryPrompt.sbn");
         var templateContent = await File.ReadAllTextAsync(templatePath);
 
-        var model = new TranslateStoryParametersModel(_viewModel.Language, "Polish", originalStoryHtml);
+        var model = new TranslateStoryParametersModel(_viewModel.LearnedLanguage, "Polish", originalStoryHtml);
         var template = ScribanTemplate.Parse(templateContent, templatePath);
 
         var translationPrompt = await template.RenderAsync(model, x => x.Name);
@@ -193,6 +195,7 @@ public partial class MainWindow : Window
 
 internal record GenerateStoryParametersModel(
     string Language,
+    string HintLanguage,
     string Genre,
     int PreferredLengthOfAStoryInWords,
     ObservableCollection<FlashcardViewModel> Flashcards);

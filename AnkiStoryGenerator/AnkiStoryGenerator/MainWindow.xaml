@@ -56,8 +56,12 @@
                         Parameters:
                     </TextBlock>
                     <TextBlock>
-                        <Run FontWeight="Bold">Language:</Run><Run Text="&#160;" />
-                        <Run Foreground="DarkOrchid" Text="{Binding Language, Mode=OneWay}" />
+                        <Run FontWeight="Bold">Learned Language:</Run><Run Text="&#160;" />
+                        <Run Foreground="DarkOrchid" Text="{Binding LearnedLanguage, Mode=OneWay}" />
+                    </TextBlock>
+                    <TextBlock>
+                        <Run FontWeight="Bold">Native Language:</Run><Run Text="&#160;" />
+                        <Run Foreground="DarkOrchid" Text="{Binding NativeLanguage, Mode=OneWay}" />
                     </TextBlock>
                     <TextBlock>
                         <Run FontWeight="Bold">Deck:</Run><Run Text="&#160;" />
@@ -105,12 +109,12 @@
                         <DataGrid.Columns>
                             <DataGridTextColumn
                                 Width="*"
-                                Binding="{Binding Question, Mode=OneTime}"
-                                Header="Question" />
+                                Binding="{Binding WordInLearnedLanguage, Mode=OneTime}"
+                                Header="Learned language" />
                             <DataGridTextColumn
                                 Width="*"
-                                Binding="{Binding Answer, Mode=OneTime}"
-                                Header="Answer" />
+                                Binding="{Binding WordInNativeLanguage, Mode=OneTime}"
+                                Header="Native language" />
                         </DataGrid.Columns>
                     </DataGrid>
                 </DockPanel>

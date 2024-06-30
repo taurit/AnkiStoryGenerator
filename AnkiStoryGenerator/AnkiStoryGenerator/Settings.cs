@@ -20,7 +20,7 @@ public class Settings
     public const string TooltipStylesPath = "d:\\Projekty\\AnkiStoryGenerator\\WordExplainerScript\\script.css";
 
     // hardcoded for simplicity in the proof-of-concept phase
-    public const string AnkiDatabaseFilePath = "d:\\Projekty\\AnkiStoryGenerator\\LocalDevData\\collection.anki2";
+    public const string AnkiDatabaseFilePath = "c:\\Users\\windo\\AppData\\Roaming\\Anki2\\Usuario 1\\collection.anki2";
 
     // hardcoded for simplicity in the proof-of-concept phase
     public const string AudioFilesCacheDirectory = "s:\\Caches\\AnkiStoryGeneratorAudioCache\\";
