@@ -163,12 +163,15 @@ public partial class MainWindow : Window
         }
 
         var storyInPlainText = HtmlHelpers.ConvertToPlainText(this._latestStoryHtml);
-        // todo add some caching
-        var ttsAudio = await TextToSpeechHelpers.SynthesizeTextToSpeech(storyInPlainText);
 
-        // todo save to some temporary directory, cache...
-        await File.WriteAllBytesAsync("d:/testAAA.mp3", ttsAudio);
-        var startInfo = new ProcessStartInfo("d:/testAAA.mp3") { UseShellExecute = true };
+        var cacheFileName = Path.Combine(Settings.AudioFilesCacheDirectory, storyInPlainText.GetHashCode() + ".mp3");
+        if (!File.Exists(cacheFileName))
+        {
+            var ttsAudio = await TextToSpeechHelpers.SynthesizeTextToSpeech(storyInPlainText);
+            await File.WriteAllBytesAsync(cacheFileName, ttsAudio);
+        }
+
+        var startInfo = new ProcessStartInfo(cacheFileName) { UseShellExecute = true };
         Process.Start(startInfo);
     }
 

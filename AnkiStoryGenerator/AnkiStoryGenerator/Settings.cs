@@ -27,6 +27,12 @@ public class Settings
     // hardcoded for simplicity in the proof-of-concept phase
     public const string AnkiDatabaseFilePath = "d:\\Projekty\\AnkiStoryGenerator\\LocalDevData\\collection.anki2";
 
+    // hardcoded for simplicity in the proof-of-concept phase
+    public const string AudioFilesCacheDirectory = "s:\\Caches\\AnkiStoryGeneratorAudioCache\\";
+
+    // hardcoded for simplicity in the proof-of-concept phase
+    public const string GptResponseCacheDirectory = "s:\\Caches\\AnkiStoryGeneratorGptResponseCache\\";
+
     public readonly string OpenAiDeveloperKey;
     public readonly string OpenAiOrganization;
 
