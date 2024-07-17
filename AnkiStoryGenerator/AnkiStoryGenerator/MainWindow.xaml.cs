@@ -113,7 +113,7 @@ public partial class MainWindow : Window
         ChatClient client = new(model: Settings.OpenAiModelId, new ApiKeyCredential(appSettings.OpenAiDeveloperKey), openAiClientOptions);
 
         // generate story
-        var storyCacheFileName = $"{Settings.OpenAiModelId}_{(_viewModel.ChatGptPrompt ?? "").GetHashCode()}.txt";
+        var storyCacheFileName = $"{Settings.OpenAiModelId}_{(_viewModel.ChatGptPrompt ?? "").GetHashCodeStable()}.txt";
         var storyCacheFilePath = Path.Combine(Settings.GptResponseCacheDirectory, storyCacheFileName);
 
         if (!File.Exists(storyCacheFilePath))
@@ -129,7 +129,7 @@ public partial class MainWindow : Window
         // translate story
         var translationPrompt = await GetStoryTranslationPrompt(generatedStoryHtmlUnwrapped);
 
-        var translationCacheFileName = $"{Settings.OpenAiModelId}_{(translationPrompt ?? "").GetHashCode()}.txt";
+        var translationCacheFileName = $"{Settings.OpenAiModelId}_{(translationPrompt ?? "").GetHashCodeStable()}.txt";
         var translationCacheFilePath = Path.Combine(Settings.GptResponseCacheDirectory, translationCacheFileName);
 
         if (!File.Exists(translationCacheFilePath))
@@ -177,7 +177,7 @@ public partial class MainWindow : Window
 
         var storyInPlainText = HtmlHelpers.ConvertToPlainText(this._latestStoryHtml);
 
-        var cacheFileName = Path.Combine(Settings.AudioFilesCacheDirectory, storyInPlainText.GetHashCode() + ".mp3");
+        var cacheFileName = Path.Combine(Settings.AudioFilesCacheDirectory, storyInPlainText.GetHashCodeStable() + ".mp3");
         if (!File.Exists(cacheFileName))
         {
             var ttsAudio = await TextToSpeechHelpers.SynthesizeTextToSpeech(storyInPlainText);
