@@ -96,6 +96,15 @@
                         Click="LoadFlashcards_OnClick">
                         Load flashcards
                     </Button>
+
+
+                    <Button
+                        Name="TestRssGeneration"
+                        Margin="0,10,0,0"
+                        Padding="5"
+                        Click="TestRssGeneration_OnClick">
+                        Test RSS
+                    </Button>
                 </StackPanel>
                 <DockPanel
                     Grid.Row="1"

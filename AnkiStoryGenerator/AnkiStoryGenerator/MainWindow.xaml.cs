@@ -188,6 +188,10 @@ public partial class MainWindow : Window
         Process.Start(startInfo);
     }
 
+    private void TestRssGeneration_OnClick(object sender, RoutedEventArgs e)
+    {
+        new RssHelper().CreateFeed();
+    }
 }
 
 internal record GenerateStoryParametersModel(
