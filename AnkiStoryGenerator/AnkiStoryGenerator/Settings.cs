@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using System.IO;
 
 namespace AnkiStoryGenerator;
 
@@ -14,25 +15,61 @@ public class Settings
 #endif
 
     // hardcoded for simplicity in the proof-of-concept phase
-    public const string TooltipScriptPath = "d:\\Projekty\\AnkiStoryGenerator\\WordExplainerScript\\script.js";
+    public static string TooltipScriptPath = ReturnFirstFileThatExists([
+        "d:\\Projekty\\AnkiStoryGenerator\\WordExplainerScript\\script.js",
+        "d:\\Projects\\AnkiStoryGenerator\\WordExplainerScript\\script.js"
+    ]);
 
     // hardcoded for simplicity in the proof-of-concept phase
-    public const string TooltipStylesPath = "d:\\Projekty\\AnkiStoryGenerator\\WordExplainerScript\\script.css";
+    public static string TooltipStylesPath = ReturnFirstFileThatExists([
+        "d:\\Projekty\\AnkiStoryGenerator\\WordExplainerScript\\script.css",
+        "d:\\Projects\\AnkiStoryGenerator\\WordExplainerScript\\script.css"
+    ]);
 
     // hardcoded for simplicity in the proof-of-concept phase
-    public const string AnkiDatabaseFilePath = "c:\\Users\\windo\\AppData\\Roaming\\Anki2\\Usuario 1\\collection.anki2";
+    public static string AnkiDatabaseFilePath = ReturnFirstFileThatExists([
+        "c:\\Users\\windo\\AppData\\Roaming\\Anki2\\Usuario 1\\collection.anki2", // stationary pc
+        "c:\\Users\\windo\\AppData\\Roaming\\Anki2\\User 1\\collection.anki2"     // dell laptop
+
+    ]);
 
     // hardcoded for simplicity in the proof-of-concept phase
-    public const string AudioFilesCacheDirectory = "s:\\Caches\\AnkiStoryGeneratorAudioCache\\";
+    public static string AudioFilesCacheDirectory = ReturnFirstDirectoryThatExists([
+        "s:\\Caches\\AnkiStoryGeneratorAudioCache\\",
+        "d:\\Projects\\Caches\\AnkiStoryGeneratorAudioCache\\"
+    ]);
 
     // hardcoded for simplicity in the proof-of-concept phase
-    public const string GptResponseCacheDirectory = "s:\\Caches\\AnkiStoryGeneratorGptResponseCache\\";
+    public static string GptResponseCacheDirectory = ReturnFirstDirectoryThatExists([
+        "s:\\Caches\\AnkiStoryGeneratorGptResponseCache\\",
+        "d:\\Projects\\Caches\\AnkiStoryGeneratorGptResponseCache\\"
+    ]);
 
     public readonly string OpenAiDeveloperKey;
     public readonly string OpenAiOrganization;
 
     public readonly string AzureTtsRegion;
     public readonly string AzureTtsKey;
+
+    private static string ReturnFirstFileThatExists(string[] paths)
+    {
+        foreach (var path in paths)
+        {
+            if (File.Exists(path)) return path;
+        }
+
+        throw new Exception("None of the files exists:\n" + String.Join("\n", paths));
+    }
+
+    private static string ReturnFirstDirectoryThatExists(string[] paths)
+    {
+        foreach (var path in paths)
+        {
+            if (Directory.Exists(path)) return path;
+        }
+
+        throw new Exception("None of the directories exists:\n" + String.Join("\n", paths));
+    }
 
 
     public Settings()
