@@ -8,7 +8,7 @@
     xmlns:wpf="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
     Title="Anki story generator"
     Width="1200"
-    Height="850"
+    Height="550"
     d:DataContext="{d:DesignInstance viewModels:MainWindowViewModel}"
     mc:Ignorable="d">
     <Grid>
@@ -76,6 +76,18 @@
                         <Run FontWeight="Bold" Text="Length of story in words:" /><Run Text="&#160;" />
                         <Run Foreground="DarkOrchid" Text="{Binding PreferredLengthOfAStoryInWords, Mode=OneWay}" />
                     </TextBlock>
+                    <ComboBox
+                        Name="Genre"
+                        Margin="0,10,0,0"
+                        Text="{Binding Genre, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}">
+                        <ComboBoxItem IsSelected="True">crime</ComboBoxItem>
+                        <ComboBoxItem>fantasy</ComboBoxItem>
+                        <ComboBoxItem>sci-fi</ComboBoxItem>
+                        <ComboBoxItem>mystery</ComboBoxItem>
+                        <ComboBoxItem>horror</ComboBoxItem>
+                        <ComboBoxItem>romance</ComboBoxItem>
+                        <ComboBoxItem>comedy</ComboBoxItem>
+                    </ComboBox>
 
                     <Button
                         Name="LoadFlashcards"

@@ -9,7 +9,7 @@ public class MainWindowViewModel
     public string LearnedLanguage { get; } = "Spanish (Castillan)"; // "Spanish (Castillan)"; // hardcoded, but in the future, this could be a dropdown
     public string NativeLanguage { get; } = "Polish"; // hardcoded, but in the future, this could be a dropdown
     public string DeckName { get; } = "1. Spanish"; // "3. English"; // hardcoded, but in the future, this could be a dropdown
-    public string Genre { get; } = "crime"; // hardcoded, but in the future, this could be a dropdown
+    public string Genre { get; set; }
 
     public int NumRecentFlashcardsToUse { get; } = 20;
     public int PreferredLengthOfAStoryInWords { get; } = 200;

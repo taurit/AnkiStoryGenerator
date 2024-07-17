@@ -149,10 +149,7 @@ public partial class MainWindow : Window
         var templatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Prompts\\GenerateStoryPrompt.sbn");
         var templateContent = await File.ReadAllTextAsync(templatePath);
 
-        var random = new Random();
-        var randomGenre = new[] { "fantasy", "sci-fi", "mystery", "horror", "romance", "comedy", "crime" }[random.Next(0, 7)];
-
-        var model = new GenerateStoryParametersModel(_viewModel.LearnedLanguage, _viewModel.NativeLanguage, randomGenre, _viewModel.PreferredLengthOfAStoryInWords, _viewModel.Flashcards);
+        var model = new GenerateStoryParametersModel(_viewModel.LearnedLanguage, _viewModel.NativeLanguage, _viewModel.Genre, _viewModel.PreferredLengthOfAStoryInWords, _viewModel.Flashcards);
         var template = ScribanTemplate.Parse(templateContent, templatePath);
 
         _viewModel.ChatGptPrompt = await template.RenderAsync(model, x => x.Name);
