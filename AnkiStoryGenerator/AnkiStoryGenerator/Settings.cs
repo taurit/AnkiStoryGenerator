@@ -6,7 +6,7 @@ namespace AnkiStoryGenerator;
 public class Settings
 {
 #if !DEBUG
-    public const string OpenAiModelId = "gpt-3.5-turbo";
+    public const string OpenAiModelId = "gpt-4o-mini";
 #else
     public const string OpenAiModelId = "gpt-4o";
 
