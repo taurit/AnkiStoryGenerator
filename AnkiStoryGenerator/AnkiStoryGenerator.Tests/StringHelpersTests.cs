@@ -1,4 +1,5 @@
 ﻿using AnkiStoryGenerator.Utilities;
+using FluentAssertions;
 
 namespace AnkiStoryGenerator.Tests;
 
@@ -17,7 +18,7 @@ This is a code block
         var result = StringHelpers.RemoveBackticksBlockWrapper(input);
 
         // Assert
-        Assert.AreEqual("This is a code block", result);
+        result.Should().Be("This is a code block");
     }
 
     [TestMethod]
@@ -34,9 +35,9 @@ Some other text
         var result = StringHelpers.RemoveBackticksBlockWrapper(input);
 
         // Assert
-        Assert.AreEqual(@"This is a code block
+        result.Should().Be(@"This is a code block
 ```
-Some other text", result);
+Some other text");
     }
 
 
@@ -50,6 +51,6 @@ Some other text", result);
         var result = StringHelpers.RemoveBackticksBlockWrapper(input);
 
         // Assert
-        Assert.AreEqual(input, result);
+        result.Should().Be(input);
     }
 }
