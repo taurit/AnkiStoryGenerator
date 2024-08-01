@@ -1,5 +1,7 @@
-﻿using PropertyChanged;
+﻿using AnkiStoryGenerator.Utilities;
+using PropertyChanged;
 using System.Collections.ObjectModel;
+using System.IO;
 
 namespace AnkiStoryGenerator.ViewModels;
 
@@ -16,6 +18,14 @@ public class MainWindowViewModel
 
     public ObservableCollection<FlashcardViewModel> Flashcards { get; set; } = [];
     public string? ChatGptPrompt { get; set; }
+
+    public string? LatestStoryHtml { get; set; }
+
+    [DependsOn(nameof(LatestStoryHtml))]
+    public string LatestStoryPlainText => HtmlHelpers.ConvertToPlainText(LatestStoryHtml);
+
+    [DependsOn(nameof(LatestStoryPlainText))]
+    public string LatestStoryAudioFileName => Path.Combine(Settings.AudioFilesCacheDirectory, LatestStoryPlainText.GetHashCodeStable() + ".mp3");
 }
 
 [AddINotifyPropertyChangedInterface]

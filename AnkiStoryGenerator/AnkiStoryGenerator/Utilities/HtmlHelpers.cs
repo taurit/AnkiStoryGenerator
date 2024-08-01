@@ -11,8 +11,13 @@ public static class HtmlHelpers
     /// </summary>
     /// <param name="html">The HTML.</param>
     /// <returns></returns>
-    public static string ConvertToPlainText(string html)
+    public static string ConvertToPlainText(string? html)
     {
+        if (html is null)
+        {
+            return string.Empty;
+        }
+
         HtmlDocument doc = new();
         doc.LoadHtml(html);
 

@@ -83,6 +83,7 @@
                     <ComboBox
                         Name="Genre"
                         Margin="0,10,0,0"
+                        SelectionChanged="Genre_OnSelectionChanged"
                         Text="{Binding Genre, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}">
                         <ComboBoxItem IsSelected="True">crime</ComboBoxItem>
                         <ComboBoxItem>fantasy</ComboBoxItem>
@@ -92,14 +93,6 @@
                         <ComboBoxItem>romance</ComboBoxItem>
                         <ComboBoxItem>comedy</ComboBoxItem>
                     </ComboBox>
-
-                    <Button
-                        Name="LoadFlashcards"
-                        Margin="0,10,0,0"
-                        Padding="5"
-                        Click="LoadFlashcards_OnClick">
-                        Load flashcards and prepare prompt
-                    </Button>
 
                 </StackPanel>
                 <DockPanel

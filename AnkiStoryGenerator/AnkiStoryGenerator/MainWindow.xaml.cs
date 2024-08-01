@@ -9,6 +9,7 @@ using System.ClientModel;
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
+using System.Windows.Controls;
 
 namespace AnkiStoryGenerator;
 
@@ -19,12 +20,12 @@ namespace AnkiStoryGenerator;
 public partial class MainWindow : Window
 {
     private readonly MainWindowViewModel _viewModel = new();
-    private string? _latestStoryHtml;
 
     public MainWindow()
     {
         DataContext = _viewModel;
         InitializeComponent();
+        LoadFlashcards();
     }
 
     private static async Task SetPreviewWindowHtml(WebView2 webViewControl, string htmlContentToSet)
@@ -40,7 +41,7 @@ public partial class MainWindow : Window
         webViewControl.NavigateToString(htmlContentToSet);
     }
 
-    private async void LoadFlashcards_OnClick(object sender, RoutedEventArgs e)
+    private async void LoadFlashcards()
     {
         var flashcards =
             AnkiHelpers.GetRecentlyReviewedCardsFromSpecificDeck(Settings.AnkiDatabaseFilePath, _viewModel.DeckName, _viewModel.NumRecentFlashcardsToUse);
@@ -59,15 +60,24 @@ public partial class MainWindow : Window
 
     private async void GenerateStory_OnClick(object sender, RoutedEventArgs e)
     {
+        // generate story
         var story = await GenerateStoryUsingChatGptApi();
 
-        this._latestStoryHtml = story.OriginalHtml;
+        this._viewModel.LatestStoryHtml = story.OriginalHtml;
 
         var storyHtmlWithTooltips = TooltipsHelper.AddInteractiveTooltipsMarkupToTheStory(story.OriginalHtml, _viewModel.Flashcards);
         var translationHtmlWithTooltips = TooltipsHelper.AddInteractiveTooltipsMarkupToTheStory(story.TranslatedHtml, _viewModel.Flashcards);
 
         await SetPreviewWindowHtml(WebViewControlOriginal, storyHtmlWithTooltips);
         await SetPreviewWindowHtml(WebViewControlTranslation, translationHtmlWithTooltips);
+
+        // generate audio
+
+        if (!File.Exists(_viewModel.LatestStoryAudioFileName))
+        {
+            var ttsAudio = await TextToSpeechHelpers.SynthesizeTextToSpeech(_viewModel.LatestStoryPlainText);
+            await File.WriteAllBytesAsync(_viewModel.LatestStoryAudioFileName, ttsAudio);
+        }
     }
 
     private async Task<GeneratedStory> GenerateStoryUsingChatGptApi()
@@ -111,27 +121,23 @@ public partial class MainWindow : Window
 
     private async void PlayStory_OnClick(object sender, RoutedEventArgs e)
     {
-        if (this._latestStoryHtml is null)
+        if (this._viewModel.LatestStoryHtml is null)
         {
             MessageBox.Show("Please generate a story first.");
             return;
         }
 
-        var storyInPlainText = HtmlHelpers.ConvertToPlainText(this._latestStoryHtml);
-
-        var cacheFileName = Path.Combine(Settings.AudioFilesCacheDirectory, storyInPlainText.GetHashCodeStable() + ".mp3");
-        if (!File.Exists(cacheFileName))
-        {
-            var ttsAudio = await TextToSpeechHelpers.SynthesizeTextToSpeech(storyInPlainText);
-            await File.WriteAllBytesAsync(cacheFileName, ttsAudio);
-        }
-
-        var startInfo = new ProcessStartInfo(cacheFileName) { UseShellExecute = true };
+        var startInfo = new ProcessStartInfo(_viewModel.LatestStoryAudioFileName) { UseShellExecute = true };
         Process.Start(startInfo);
     }
 
     private void PublishToRssFeed_OnClick(object sender, RoutedEventArgs e)
     {
         new RssHelper().CreateFeed();
+    }
+
+    private void Genre_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        LoadFlashcards();
     }
 }
