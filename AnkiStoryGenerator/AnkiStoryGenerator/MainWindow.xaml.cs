@@ -6,11 +6,9 @@ using OpenAI;
 using OpenAI.Chat;
 using PropertyChanged;
 using System.ClientModel;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
-using ScribanTemplate = Scriban.Template;
 
 namespace AnkiStoryGenerator;
 
@@ -56,7 +54,7 @@ public partial class MainWindow : Window
             this._viewModel.Flashcards.Add(flashcardViewModel);
         }
 
-        await UpdateChatGptPrompt();
+        await promp.UpdateChatGptPrompt(_viewModel);
     }
 
     private async void GenerateStory_OnClick(object sender, RoutedEventArgs e)
@@ -65,44 +63,11 @@ public partial class MainWindow : Window
 
         this._latestStoryHtml = story.OriginalHtml;
 
-        var storyHtmlWithTooltips = AddTooltipsForFlashcardWords(story.OriginalHtml, _viewModel.Flashcards);
-        var translationHtmlWithTooltips = AddTooltipsForFlashcardWords(story.TranslatedHtml, _viewModel.Flashcards);
+        var storyHtmlWithTooltips = TooltipsHelper.AddInteractiveTooltipsMarkupToTheStory(story.OriginalHtml, _viewModel.Flashcards);
+        var translationHtmlWithTooltips = TooltipsHelper.AddInteractiveTooltipsMarkupToTheStory(story.TranslatedHtml, _viewModel.Flashcards);
 
         await SetPreviewWindowHtml(WebViewControlOriginal, storyHtmlWithTooltips);
         await SetPreviewWindowHtml(WebViewControlTranslation, translationHtmlWithTooltips);
-    }
-
-    private static string AddTooltipsForFlashcardWords(string openAiResponse, ObservableCollection<FlashcardViewModel> viewModelFlashcards)
-    {
-        // OpenAi was asked to respond with a story with basic HTML markup: paragraphs, and requested words highlighted with `<b data-id="{WordNumericId}"></b>`.
-        // Now we need to:
-        // - include CSS styles
-        // - include JavaScript to show tooltips on hover over the highlighted words
-
-        var story = openAiResponse;
-
-        foreach (var flashcard in viewModelFlashcards)
-        {
-            var tooltipContent = $"{flashcard.WordInNativeLanguage}<hr />{flashcard.WordInLearnedLanguage}";
-            story = story.Replace($"data-id=\"{flashcard.Id}\"", $"data-id=\"{flashcard.Id}\" data-tooltip=\"{tooltipContent}\"");
-        }
-
-        var htmlDocument = $@"<!DOCTYPE html>
-<html>
-<head>
-  <style type=""text/css"">
-{File.ReadAllText(Settings.TooltipStylesPath)}
-  </style>
-</head>
-<body>
-{story}
-<script>
-{File.ReadAllText(Settings.TooltipScriptPath)}
-</script>
-</body>
-</html>
-";
-        return htmlDocument;
     }
 
     private async Task<GeneratedStory> GenerateStoryUsingChatGptApi()
@@ -127,7 +92,7 @@ public partial class MainWindow : Window
         var generatedStoryHtmlUnwrapped = StringHelpers.RemoveBackticksBlockWrapper(generatedStoryHtml);
 
         // translate story
-        var translationPrompt = await GetStoryTranslationPrompt(generatedStoryHtmlUnwrapped);
+        var translationPrompt = await PromptsHelper.GetStoryTranslationPrompt(_viewModel, generatedStoryHtmlUnwrapped);
 
         var translationCacheFileName = $"{Settings.OpenAiModelId}_{(translationPrompt ?? "").GetHashCodeStable()}.txt";
         var translationCacheFilePath = Path.Combine(Settings.GptResponseCacheDirectory, translationCacheFileName);
@@ -142,29 +107,6 @@ public partial class MainWindow : Window
         var translatedStoryHtmlUnwrapped = StringHelpers.RemoveBackticksBlockWrapper(translatedStoryHtml);
 
         return new GeneratedStory(generatedStoryHtmlUnwrapped, translatedStoryHtmlUnwrapped);
-    }
-
-    private async Task UpdateChatGptPrompt()
-    {
-        var templatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Prompts\\GenerateStoryPrompt.sbn");
-        var templateContent = await File.ReadAllTextAsync(templatePath);
-
-        var model = new GenerateStoryParametersModel(_viewModel.LearnedLanguage, _viewModel.NativeLanguage, _viewModel.Genre, _viewModel.PreferredLengthOfAStoryInWords, _viewModel.Flashcards);
-        var template = ScribanTemplate.Parse(templateContent, templatePath);
-
-        _viewModel.ChatGptPrompt = await template.RenderAsync(model, x => x.Name);
-    }
-
-    private async Task<string> GetStoryTranslationPrompt(string originalStoryHtml)
-    {
-        var templatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Prompts\\TranslateStoryPrompt.sbn");
-        var templateContent = await File.ReadAllTextAsync(templatePath);
-
-        var model = new TranslateStoryParametersModel(_viewModel.LearnedLanguage, "Polish", originalStoryHtml);
-        var template = ScribanTemplate.Parse(templateContent, templatePath);
-
-        var translationPrompt = await template.RenderAsync(model, x => x.Name);
-        return translationPrompt;
     }
 
     private async void PlayStory_OnClick(object sender, RoutedEventArgs e)
@@ -188,19 +130,8 @@ public partial class MainWindow : Window
         Process.Start(startInfo);
     }
 
-    private void TestRssGeneration_OnClick(object sender, RoutedEventArgs e)
+    private void PublishToRssFeed_OnClick(object sender, RoutedEventArgs e)
     {
         new RssHelper().CreateFeed();
     }
 }
-
-internal record GenerateStoryParametersModel(
-    string Language,
-    string HintLanguage,
-    string Genre,
-    int PreferredLengthOfAStoryInWords,
-    ObservableCollection<FlashcardViewModel> Flashcards);
-
-internal record TranslateStoryParametersModel(string FromLanguage, string ToLanguage, string InputHtml);
-
-internal record GeneratedStory(string OriginalHtml, string TranslatedHtml);

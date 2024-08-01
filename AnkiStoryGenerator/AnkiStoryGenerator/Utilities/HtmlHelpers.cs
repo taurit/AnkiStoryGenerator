@@ -30,7 +30,6 @@ public static class HtmlHelpers
         }
     }
 
-
     private static void ConvertTo(HtmlNode node, TextWriter outText)
     {
         switch (node.NodeType)
