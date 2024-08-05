@@ -26,6 +26,13 @@ public class MainWindowViewModel
 
     [DependsOn(nameof(LatestStoryPlainText))]
     public string LatestStoryAudioFileName => Path.Combine(Settings.AudioFilesCacheDirectory, LatestStoryPlainText.GetHashCodeStable() + ".mp3");
+
+    public string LatestStoryHtmlWithTooltips { get; set; }
+    public string LatestTranslationHtmlWithTooltips { get; set; }
+
+    // Extract the title from the HTML content => the title is expected between <h1> and </h1> tags
+    [DependsOn(nameof(LatestStoryHtml))]
+    public string LatestStoryTitle => HtmlHelpers.ExtractTitleFromHtml(LatestStoryHtml);
 }
 
 [AddINotifyPropertyChangedInterface]

@@ -30,7 +30,11 @@ public class Settings
     public static string AnkiDatabaseFilePath = ReturnFirstFileThatExists([
         "c:\\Users\\windo\\AppData\\Roaming\\Anki2\\Usuario 1\\collection.anki2", // stationary pc
         "c:\\Users\\windo\\AppData\\Roaming\\Anki2\\User 1\\collection.anki2"     // dell laptop
+    ]);
 
+    // rss feed file path
+    public static string RssFeedFolder = ReturnFirstDirectoryThatExists([
+        "s:\\Caches\\AnkiStoryGeneratorRssCache\\", // stationary pc
     ]);
 
     // hardcoded for simplicity in the proof-of-concept phase

@@ -88,4 +88,23 @@ public static class HtmlHelpers
                 break;
         }
     }
+
+    public static string ExtractTitleFromHtml(string? latestStoryHtml)
+    {
+        if (latestStoryHtml is null)
+        {
+            return "Title not found";
+        }
+
+        HtmlDocument doc = new();
+        doc.LoadHtml(latestStoryHtml);
+
+        var titleNode = doc.DocumentNode.SelectSingleNode("//h1");
+        if (titleNode is null)
+        {
+            return string.Empty;
+        }
+
+        return titleNode.InnerText;
+    }
 }

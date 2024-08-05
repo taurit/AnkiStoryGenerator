@@ -1,45 +1,69 @@
-﻿using System.ServiceModel.Syndication;
+﻿using System.IO;
+using System.ServiceModel.Syndication;
+using System.Text.Json;
 using System.Xml;
 
 namespace AnkiStoryGenerator.Utilities;
+
+internal record PodcastEpisode(string StoryTitle, string StoryHtmlSpanish, string StoryHtmlPolish, string AudioSpanishFilePath, DateTimeOffset Created);
+
 internal class RssHelper
 {
-    internal void CreateFeed()
+    // Internal format to keep the state of all published episodes
+    private static readonly string EpisodesLocalFilePath = Path.Combine(Settings.RssFeedFolder, "episodes.json");
+
+    // A public feed of episodes, re-generated from scratch every time a new episode is added (rather than updated)
+    private static readonly string RssFeedLocalFilePath = Path.Combine(Settings.RssFeedFolder, "stories.xml");
+
+    internal void AddEpisodeToTheFeedInputData(PodcastEpisode podcastEpisode)
     {
+        // load and deserialize the episodes from `EpisodesLocalFilePath`
+        var episodes = LoadPodcastEpisodesFromInternalDatabase();
+
+        // add the new episode to the list
+        episodes.Add(podcastEpisode);
+
+        // serialize and save the episodes back to `EpisodesLocalFilePath`
+        var serializedEpisodes = JsonSerializer.Serialize(episodes);
+        File.WriteAllText(EpisodesLocalFilePath, serializedEpisodes);
+    }
+
+
+    internal void GenerateRssFeed()
+    {
+        // Load episodes from internal database
+        var episodes = LoadPodcastEpisodesFromInternalDatabase();
+
         // Create feed items (episodes)
-        var items = new List<SyndicationItem>
+        var rssItems = new List<SyndicationItem>();
+
+        foreach (var episode in episodes)
         {
-            CreatePodcastItem(
-                title: "Episode 1",
-                description: "This is the first episode.",
-                url: "https://example.com/podcasts/episode1.mp3",
-                length: 12345678,
-                pubDate: DateTime.Now.AddDays(-10)
-            ),
-            CreatePodcastItem(
-                title: "Episode 2",
-                description: "This is the second episode.",
-                url: "https://example.com/podcasts/episode2.mp3",
-                length: 23456789,
-                pubDate: DateTime.Now.AddDays(-5)
-            )
-        };
+            var newRssItem = CreatePodcastItem(
+                title: $"{episode.StoryTitle}",
+                description: episode.StoryHtmlSpanish,
+                url: episode.AudioSpanishFilePath,
+                length: new FileInfo(episode.AudioSpanishFilePath).Length,
+                pubDate: episode.Created.UtcDateTime
+            );
+            rssItems.Add(newRssItem);
+        }
 
         // Create the podcast feed
         var feed = new SyndicationFeed(
-            "My Podcast",
-            "A description of my podcast.",
+            "Anki Stories",
+            "A proof-of-concept feed for Anki Story Generator.",
             new Uri("https://example.com/podcast"),
-            items
+            rssItems
         )
         {
-            Copyright = new TextSyndicationContent("© 2024 My Podcast"),
-            Language = "en-US",
+            Copyright = new TextSyndicationContent("© 2024 Taurit"),
+            Language = "es-ES",
             LastUpdatedTime = DateTimeOffset.Now
         };
 
         // Generate the RSS XML
-        using (var writer = XmlWriter.Create("d:/podcast.xml"))
+        using (var writer = XmlWriter.Create(RssFeedLocalFilePath))
         {
             var rssFormatter = new Rss20FeedFormatter(feed);
             rssFormatter.WriteTo(writer);
@@ -62,5 +86,22 @@ internal class RssHelper
         item.Links.Add(enclosure);
 
         return item;
+    }
+
+
+    private static List<PodcastEpisode> LoadPodcastEpisodesFromInternalDatabase()
+    {
+        var episodes = new List<PodcastEpisode>();
+        if (File.Exists(EpisodesLocalFilePath))
+        {
+            var json = File.ReadAllText(EpisodesLocalFilePath);
+            var episodesFromFile = JsonSerializer.Deserialize<List<PodcastEpisode>>(json);
+            if (episodesFromFile != null)
+            {
+                episodes.AddRange(episodesFromFile);
+            }
+        }
+
+        return episodes;
     }
 }

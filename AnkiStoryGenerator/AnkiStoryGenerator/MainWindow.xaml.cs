@@ -68,6 +68,9 @@ public partial class MainWindow : Window
         var storyHtmlWithTooltips = TooltipsHelper.AddInteractiveTooltipsMarkupToTheStory(story.OriginalHtml, _viewModel.Flashcards);
         var translationHtmlWithTooltips = TooltipsHelper.AddInteractiveTooltipsMarkupToTheStory(story.TranslatedHtml, _viewModel.Flashcards);
 
+        this._viewModel.LatestStoryHtmlWithTooltips = storyHtmlWithTooltips;
+        this._viewModel.LatestTranslationHtmlWithTooltips = translationHtmlWithTooltips;
+
         await SetPreviewWindowHtml(WebViewControlOriginal, storyHtmlWithTooltips);
         await SetPreviewWindowHtml(WebViewControlTranslation, translationHtmlWithTooltips);
 
@@ -133,7 +136,15 @@ public partial class MainWindow : Window
 
     private void PublishToRssFeed_OnClick(object sender, RoutedEventArgs e)
     {
-        new RssHelper().CreateFeed();
+        var podcastEpisode = new PodcastEpisode(
+            _viewModel.LatestStoryTitle,
+            _viewModel.LatestStoryHtmlWithTooltips,
+            _viewModel.LatestTranslationHtmlWithTooltips,
+            _viewModel.LatestStoryAudioFileName,
+            DateTimeOffset.Now);
+        var rssHelper = new RssHelper();
+        rssHelper.AddEpisodeToTheFeedInputData(podcastEpisode);
+        rssHelper.GenerateRssFeed();
     }
 
     private void Genre_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
