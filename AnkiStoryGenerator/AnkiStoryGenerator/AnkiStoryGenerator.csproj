@@ -16,14 +16,14 @@
 
   <ItemGroup>
     <PackageReference Include="HtmlAgilityPack" Version="1.12.4" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="10.0.0" />
-    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.3595.46" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="10.0.1" />
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.3650.58" />
     <PackageReference Include="NAudio" Version="2.2.1" />
-    <PackageReference Include="OpenAI" Version="2.7.0" />
+    <PackageReference Include="OpenAI" Version="2.8.0" />
     <PackageReference Include="PropertyChanged.Fody" Version="4.1.0" />
     <PackageReference Include="Scriban" Version="6.5.2" />
     <PackageReference Include="System.Data.SQLite" Version="2.0.2" />
-    <PackageReference Include="System.ServiceModel.Syndication" Version="10.0.0" />
+    <PackageReference Include="System.ServiceModel.Syndication" Version="10.0.1" />
   </ItemGroup>
 
   <ItemGroup>
